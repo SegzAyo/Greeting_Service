@@ -27,7 +27,7 @@ namespace  GreetingServiceAPIClient
             var authParam = Convert.ToBase64String(Encoding.UTF8.GetBytes("keen:summer2022"));
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authParam);        //Always send this header for all requests from this HttpClient
                                                                                                                                                 //_httpClient.BaseAddress = new Uri("http://localhost:5020/");
-            _httpClient.BaseAddress = new Uri("https://segunfunstodev.azurewebsites.net/api/");
+            _httpClient.BaseAddress = new Uri("https://segunfuncdev1.azurewebsites.net/api/");
             //_httpClient.BaseAddress = new Uri("http://segun-api-app.azurewebsites.net/");
             //_httpClient.BaseAddress = new Uri("http://localhost:5284/");
 
