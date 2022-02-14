@@ -1,12 +1,22 @@
-﻿using GreetingService.Infrastructure;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Net;
+using GreetingService.Infrastructure;
+using GreetingService.Core;
 
 namespace GreetingService.API.Authentication
 {
+    /// <summary>
+    /// Inspiration from https://codeburst.io/adding-basic-authentication-to-an-asp-net-core-web-api-project-5439c4cf78ee
+    /// 
+    /// An IAuthorizationFilter is executed in the ASP.NET pipeline before the execution reaches our own code.
+    /// A nice thing with ASP.NET is that it's possible to add our own custom logic to the pipeline. API authentication logic is a great example.
+    /// Implementing IAuthorizationFilter requires only one method: OnAuthorization()
+    /// This method is called for all incoming requests to methods with our custom attribute [BasicAuth]
+    /// 
+    /// </summary>
     public class BasicAuthFilter : IAuthorizationFilter
     {
         private readonly string _realm;

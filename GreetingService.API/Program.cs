@@ -15,7 +15,8 @@ builder.Services.AddControllers().AddXmlDataContractSerializerFormatters();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IUserService, HardCodedUserService>();
+//builder.Services.AddScoped<IUserService, HardCodedUserService>();
+builder.Services.AddScoped<IUserService, AppSettingsUserService>();
 
 builder.Services.AddScoped<IGreetingRepository, FileGreetingRepository>(c => {
     var config = c.GetService<IConfiguration>();

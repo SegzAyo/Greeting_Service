@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GreetingService.Core
 {
-    internal interface IUserService
+    public interface IUserService
     {
         public bool IsValidUser(string username, string password);
     }

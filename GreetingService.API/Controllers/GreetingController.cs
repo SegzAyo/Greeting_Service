@@ -26,7 +26,7 @@ namespace GreetingService.API.Controllers
 
         
 
-        [HttpGet("basic")]
+        [HttpGet]
         public IEnumerable<Greeting > Get()
         {
             return _greetingRepository.Get();
@@ -52,41 +52,55 @@ namespace GreetingService.API.Controllers
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public void Update(Greeting greeting)
+        public ActionResult Update(Greeting greeting)
         {
-            _greetingRepository.Update(greeting);
+            try
+            {
+                _greetingRepository.Update(greeting);
+                return Accepted();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"Greeting with id:{greeting.Id} not found");
+                return NotFound();
+            }
         }
+
+
         // 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public void Create(Greeting greeting)
+        public ActionResult Create(Greeting greeting)
         {
             try
             {
                 _greetingRepository.Create(greeting);
+                return Accepted(greeting);
             }
             catch (Exception)
             {
 
-                throw;
+                return NotFound();
             }
             
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public void Delete(Guid id)
+        public ActionResult<Guid> Delete(Guid id)
         {
             try
             {
                 _greetingRepository.DeleteRecord(id);
+                return Accepted(id);
             }
             catch (Exception)
             {
 
-                throw;
+                return NotFound(id);
             }
+            
         }
 
 
