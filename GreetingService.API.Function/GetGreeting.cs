@@ -51,7 +51,7 @@ namespace GreetingService.API.Function
             if (greeting == null)
                 return new NotFoundObjectResult("Not found");
 
-            return new OkObjectResult(greeting)
+            return new OkObjectResult(greeting);
             // Comment
         }
     }
