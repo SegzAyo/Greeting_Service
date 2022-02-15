@@ -4,31 +4,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;namespace GreetingService.Infrastructure
+using System.Threading.Tasks;
+
+namespace GreetingService.Infrastructure
 {
     public class MemoryGreetingRepository : IGreetingRepository
     {
-        private readonly IList<Greeting> _repository = new List<Greeting>(); public void Create(Greeting greeting)
+        private readonly IList<Greeting> _repository = new List<Greeting>();
+        public async Task CreateAsync(Greeting greeting)
         {
             _repository.Add(greeting);
         }
-        public void DeleteRecord(Guid id)
+        public async Task DeleteRecordAsync(Guid id)
         {
             var existingGreeting = _repository.FirstOrDefault(x => x.Id == id); if (existingGreeting == null)
                 throw new Exception($"Greeting with id: {id} not found");
             _repository.Remove(existingGreeting);
         }
-        public Greeting Get(Guid id)
+        public async Task<Greeting> GetAsync(Guid id)
         {
             return _repository.FirstOrDefault(x => x.Id == id);
         }
-        public IEnumerable<Greeting> Get()
+        public async Task<IEnumerable<Greeting>> GetAsync()
         {
             return _repository;
         }
-        public void Update(Greeting greeting)
+        public async Task UpdateAsync(Greeting greeting)
         {
-            var existingGreeting = _repository.FirstOrDefault(x => x.Id == greeting.Id); if (existingGreeting == null)
+            var existingGreeting = _repository.FirstOrDefault(x => x.Id == greeting.Id); 
+            if (existingGreeting == null)
                 throw new Exception($"Greeting with id: {greeting.Id} not found"); existingGreeting.To = greeting.To;
             existingGreeting.From = greeting.From;
             existingGreeting.Message = greeting.Message;

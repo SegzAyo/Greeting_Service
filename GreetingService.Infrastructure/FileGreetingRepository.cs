@@ -17,7 +17,7 @@ namespace GreetingService.Infrastructure
             _filePath = filePath;
         }
 
-        public void Create(Greeting greeting)
+        public async Task CreateAsync(Greeting greeting)
         {
             var content = File.ReadAllText(_filePath);
             var greetings = JsonSerializer.Deserialize<IList<Greeting>>(content);
@@ -30,27 +30,27 @@ namespace GreetingService.Infrastructure
             File.WriteAllText(_filePath, JsonSerializer.Serialize(greetings, _jsonSerializerOptions));
         }
 
-       
 
-        public Greeting Get(Guid id)
+
+        public async Task<Greeting> GetAsync(Guid id)
         {
             var content = File.ReadAllText(_filePath);
             var greetings = JsonSerializer.Deserialize<IList<Greeting>>(content);
             return greetings?.FirstOrDefault(x => x.Id == id);
         }
 
-        public IEnumerable<Greeting> Get()
+        public async Task<IEnumerable<Greeting>> GetAsync()
         {
             var content = File.ReadAllText(_filePath);
             var greetings = JsonSerializer.Deserialize<IList<Greeting>>(content);
             return greetings;
         }
 
-        public void Update(Greeting greeting)
+        public async Task UpdateAsync(Greeting greeting)
         {
             var content = File.ReadAllText(_filePath);
             var greetings = JsonSerializer.Deserialize<IList<Greeting>>(content);
-            var existingGreeting = greetings.FirstOrDefault(x => x.Id == greeting.Id);
+            var existingGreeting =  greetings.FirstOrDefault(x => x.Id == greeting.Id);
 
             if (existingGreeting == null)
                 throw new Exception($"Greeting with id: {greeting.Id} not found");
@@ -62,7 +62,7 @@ namespace GreetingService.Infrastructure
             File.WriteAllText(_filePath, JsonSerializer.Serialize(greetings, _jsonSerializerOptions));
         }
 
-        public void DeleteRecord(Guid id)
+        public async Task DeleteRecordAsync(Guid id)
         {
             var content = File.ReadAllText(_filePath);
             var greetings = JsonSerializer.Deserialize<IList<Greeting>>(content);

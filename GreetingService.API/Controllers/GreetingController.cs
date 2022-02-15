@@ -27,20 +27,20 @@ namespace GreetingService.API.Controllers
         
 
         [HttpGet]
-        public IEnumerable<Greeting > Get()
+        public async Task<IEnumerable<Greeting>> GetAsync()
         {
-            return _greetingRepository.Get();
+            return await _greetingRepository.GetAsync();
         }
 
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Greeting))]      
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Greeting> Get(Guid id)
+        public async Task<ActionResult<Greeting>> GetAsync(Guid id)
         {
             try
             {
-                return _greetingRepository.Get(id);
+                return await _greetingRepository.GetAsync(id);
             }
             catch (Exception)
             {
@@ -52,11 +52,11 @@ namespace GreetingService.API.Controllers
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult Update(Greeting greeting)
+        public async Task<ActionResult> UpdateAsync(Greeting greeting)
         {
             try
             {
-                _greetingRepository.Update(greeting);
+                await _greetingRepository.UpdateAsync(greeting);
                 return Accepted();
             }
             catch (Exception)
@@ -71,12 +71,12 @@ namespace GreetingService.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public ActionResult Create(Greeting greeting)
+        public async Task<ActionResult> CreateAsync(Greeting greeting)
         {
             try
             {
-                _greetingRepository.Create(greeting);
-                return Accepted(greeting);
+                await _greetingRepository.CreateAsync(greeting);
+                return Accepted();
             }
             catch (Exception)
             {
@@ -88,11 +88,11 @@ namespace GreetingService.API.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Guid> Delete(Guid id)
+        public async Task<ActionResult<Guid>> DeleterecordAsync(Guid id)
         {
             try
             {
-                _greetingRepository.DeleteRecord(id);
+                await _greetingRepository.DeleteRecordAsync(id);
                 return Accepted(id);
             }
             catch (Exception)
@@ -100,86 +100,6 @@ namespace GreetingService.API.Controllers
 
                 return NotFound(id);
             }
-            
         }
-
-
-
-
-
-        //// GET: GreetingController
-        //public ActionResult Index()
-        //{
-        //    return View();
-        //}
-
-        //// GET: GreetingController/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    return View();
-        //}
-
-        //// GET: GreetingController/Create
-        //public ActionResult Create()
-        //{
-        //    return View();
-        //}
-
-        // POST: GreetingController/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create(IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: GreetingController/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
-
-        // POST: GreetingController/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        // GET: GreetingController/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        // POST: GreetingController/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
     }
 }

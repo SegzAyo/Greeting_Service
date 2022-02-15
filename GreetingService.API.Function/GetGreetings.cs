@@ -44,7 +44,7 @@ namespace GreetingService.API.Function
             IEnumerable<Greeting> greetings;
             try
             {
-                greetings = _greetingRepository.Get();
+                greetings = await _greetingRepository.GetAsync();
             }
             catch (System.Exception)
             {

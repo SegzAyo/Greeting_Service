@@ -43,10 +43,10 @@ namespace GreetingService.API.Function
             if (!_authHandler.IsAuthorized(req))
                 return new UnauthorizedResult();
 
-            if (!Guid.TryParse(id, out var idGuid))
+            if (!Guid.TryParse(id, out var Guidid))
                 return new BadRequestObjectResult($"{id} is not a valid Guid");
 
-            var greeting = _greetingRepository.Get(idGuid);
+            var greeting = await _greetingRepository.GetAsync(Guidid);
 
             if (greeting == null)
                 return new NotFoundObjectResult("Not found");
