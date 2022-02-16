@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using GreetingService.API.Client;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
@@ -9,9 +11,14 @@ namespace GreetingService.API.Function
     public class ConvertGreetingToCsv
     {
         [FunctionName("ConvertGreetingToCsv")]
-        public void Run([BlobTrigger("samples-workitems/{name}", Connection = "XU3R7K3NLk1TUabiQb9ky2SBbOMsWOLhcrt+hzh8h8yCrxZxBiEiDqs5VFPD6cYn5h7rGRbJBICNpYHMsZvK1A==")]Stream myBlob, string name, ILogger log)
+        public async Task Run([BlobTrigger("samples-workitems/{name}", Connection = "SegBlobConnectionString")] Stream greetingJsonBlob, string name, [Blob("greetings-csv/{name}", FileAccess.Write, Connection = "LoggingStorageAccount")] Stream greetingCsvBlob, ILogger log)
         {
-            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
+            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {greetingJsonBlob.Length} Bytes");
+
+            var streamWriter = new StreamWriter(greetingCsvBlob);       
+            streamWriter.WriteLine("id;from;to;message;timestamp");     
+            streamWriter.WriteLine($"{Greeting.Id};{greeting.from};{greeting.To};{greeting.Message};{greeting.Timestamp}");  
+            await streamWriter.FlushAsync();
         }
     }
 }
