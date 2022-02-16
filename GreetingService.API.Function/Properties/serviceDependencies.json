@@ -7,6 +7,13 @@
     "storage1": {
       "type": "storage",
       "connectionId": "AzureWebJobsStorage"
+    },
+    "secrets1": {
+      "type": "secrets"
+    },
+    "storage2": {
+      "type": "storage",
+      "connectionId": "XU3R7K3NLk1TUabiQb9ky2SBbOMsWOLhcrt+hzh8h8yCrxZxBiEiDqs5VFPD6cYn5h7rGRbJBICNpYHMsZvK1A=="
     }
   }
 }
