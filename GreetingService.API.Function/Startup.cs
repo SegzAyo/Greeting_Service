@@ -50,6 +50,7 @@ namespace GreetingService.API.Function
             builder.Services.AddSingleton<IGreetingRepository, MemoryGreetingRepository>();
             builder.Services.AddScoped<IUserService, HardCodedUserService>();
             builder.Services.AddScoped<IAuthHandler, BasicAuthHandler>();
+            
         }
     }
 }
