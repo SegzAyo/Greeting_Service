@@ -32,8 +32,8 @@ namespace GreetingService.Infrastructure
         public async Task CreateAsync(Greeting greeting)
         {
             var _blobName = $"{greeting.From}/{greeting.To}/{greeting.Id}.json";
-            var blob = _containerClient.GetBlobClient(greeting.Id.ToString());            
-            if (await blob.ExistsAsync())
+            var getblob = _containerClient.GetBlobClient(_blobName);            
+            if (await getblob.ExistsAsync())
                 throw new Exception($"Greeting with id: {greeting.Id} already exists");
 
             var greetingBinary = new BinaryData(greeting, _jsonSerializerOptions);
@@ -43,19 +43,23 @@ namespace GreetingService.Infrastructure
 
         public async Task DeleteRecordAsync(Guid id)
         {
-            var getblob = _containerClient.GetBlobsAsync();
-            var blob = await _containerClient.DeleteBlobIfExistsAsync(id.ToString());
 
-            throw new Exception($"Greeting with id: {id} does not exist");
+            var getblobs = _containerClient.GetBlobsAsync();
+            var blob_delete = await getblobs.FirstOrDefaultAsync(g => g.Name.EndsWith(id.ToString()));
+            if (blob_delete == null)
+                throw new Exception($"Greeting with id: {id} does not exist");
+            var blob = await _containerClient.DeleteBlobIfExistsAsync(blob_delete.Name);
+
+            
         }
 
         public async Task<Greeting> GetAsync(Guid id)
         {
-            var blobClient = _containerClient.GetBlobClient(id.ToString());
-            if (!await blobClient.ExistsAsync())
+            var getblob = _containerClient.GetBlobClient();
+            if (!await getblob.ExistsAsync())
                 throw new Exception($"Greeting with id: {id} not found");
 
-            var blobContent = await blobClient.DownloadContentAsync();
+            var blobContent = await getblob.DownloadContentAsync();
             var greeting = blobContent.Value.Content.ToObjectFromJson<Greeting>();
             return greeting;
         }
