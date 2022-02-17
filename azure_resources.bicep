@@ -89,6 +89,10 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
           'value': '~4'
         }
         {
+          name : 'SegBlobConnectionString'
+          value : 'DefaultEndpointsProtocol=https;AccountName=${storageAccount2.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount2.id, storageAccount2.apiVersion).keys[0].value}'
+        }
+        {
           'name': 'FUNCTIONS_WORKER_RUNTIME'
           'value': 'dotnet'
         }
