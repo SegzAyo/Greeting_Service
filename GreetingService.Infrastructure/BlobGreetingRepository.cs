@@ -17,7 +17,7 @@ namespace GreetingService.Infrastructure
     {
         private readonly string _connectionString;
         private const string _containerName = "blobgreeting";
-        private const string _blobName = "greetings.json";
+        //private const string _blobName = "${from}/{to}/{id}.json";
         private readonly BlobContainerClient _containerClient;
         private readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = true };
 
@@ -31,6 +31,7 @@ namespace GreetingService.Infrastructure
 
         public async Task CreateAsync(Greeting greeting)
         {
+            var _blobName = $"{greeting.From}/{greeting.To}/{greeting.Id}.json";
             var blob = _containerClient.GetBlobClient(greeting.Id.ToString());            
             if (await blob.ExistsAsync())
                 throw new Exception($"Greeting with id: {greeting.Id} already exists");
@@ -42,6 +43,7 @@ namespace GreetingService.Infrastructure
 
         public async Task DeleteRecordAsync(Guid id)
         {
+            var getblob = _containerClient.GetBlobsAsync();
             var blob = await _containerClient.DeleteBlobIfExistsAsync(id.ToString());
 
             throw new Exception($"Greeting with id: {id} does not exist");
@@ -75,6 +77,7 @@ namespace GreetingService.Infrastructure
 
         public async Task UpdateAsync(Greeting greeting)
         {
+            var _blobName = $"{greeting.From}/{greeting.To}/{greeting.Id}.json";
             var blobClient = _containerClient.GetBlobClient(greeting.Id.ToString());
             await blobClient.DeleteIfExistsAsync();
             var greetingBinary = new BinaryData(greeting, _jsonSerializerOptions);
