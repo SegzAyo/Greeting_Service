@@ -37,7 +37,7 @@ namespace GreetingService.Infrastructure
                 throw new Exception($"Greeting with id: {greeting.Id} already exists");
 
             var greetingBinary = new BinaryData(greeting, _jsonSerializerOptions);
-            await blob.UploadAsync(greetingBinary);
+            await getblob.UploadAsync(greetingBinary);
 
         }
 
@@ -45,7 +45,7 @@ namespace GreetingService.Infrastructure
         {
 
             var getblobs = _containerClient.GetBlobsAsync();
-            var blob_delete = await getblobs.FirstOrDefaultAsync(g => g.Name.EndsWith(id.ToString()));
+            var blob_delete = await getblobs.FirstOrDefaultAsync(g => g.Name.Contains(id.ToString()));
             if (blob_delete == null)
                 throw new Exception($"Greeting with id: {id} does not exist");
             var blob = await _containerClient.DeleteBlobIfExistsAsync(blob_delete.Name);
@@ -55,11 +55,10 @@ namespace GreetingService.Infrastructure
 
         public async Task<Greeting> GetAsync(Guid id)
         {
-            var getblob = _containerClient.GetBlobClient();
-            if (!await getblob.ExistsAsync())
-                throw new Exception($"Greeting with id: {id} not found");
-
-            var blobContent = await getblob.DownloadContentAsync();
+            var getblob = _containerClient.GetBlobsAsync();
+            var blob_selected = await getblob.FirstOrDefaultAsync(g => g.Name.Contains(id.ToString()));
+            var blobClient = _containerClient.GetBlobClient(blob_selected.Name);
+            var blobContent = await blobClient.DownloadContentAsync();
             var greeting = blobContent.Value.Content.ToObjectFromJson<Greeting>();
             return greeting;
         }
@@ -81,7 +80,6 @@ namespace GreetingService.Infrastructure
 
         public async Task UpdateAsync(Greeting greeting)
         {
-            var _blobName = $"{greeting.From}/{greeting.To}/{greeting.Id}.json";
             var blobClient = _containerClient.GetBlobClient(greeting.Id.ToString());
             await blobClient.DeleteIfExistsAsync();
             var greetingBinary = new BinaryData(greeting, _jsonSerializerOptions);
