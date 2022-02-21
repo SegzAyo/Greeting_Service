@@ -36,6 +36,8 @@ namespace GreetingService.API.Function
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "greeting")] HttpRequest req)
         {
+            var from = req.Query["from"];
+            var to = req.Query["to"];
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
             if (!_authHandler.IsAuthorized(req))
@@ -44,7 +46,7 @@ namespace GreetingService.API.Function
             IEnumerable<Greeting> greetings;
             try
             {
-                greetings = await _greetingRepository.GetAsync();
+                greetings = await _greetingRepository.GetAsync(from, to);
             }
             catch (System.Exception)
             {

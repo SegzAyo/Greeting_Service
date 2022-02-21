@@ -74,5 +74,18 @@ namespace GreetingService.Infrastructure
             greetings.Remove(greetingToDelete);
             File.WriteAllText(_filePath, JsonSerializer.Serialize(greetings, _jsonSerializerOptions));
         }
+
+        public async Task<IEnumerable<Greeting>> GetAsync(string from, string to)
+        {
+            var greetings = await GetAsync();
+
+            if (!string.IsNullOrWhiteSpace(from))
+                greetings = greetings.Where(x => x.From.Equals(from, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(to))
+                greetings = greetings.Where(x => x.To.Equals(to, StringComparison.OrdinalIgnoreCase));
+
+            return greetings;
+        }
     }
 }

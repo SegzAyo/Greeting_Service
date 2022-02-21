@@ -14,5 +14,6 @@ namespace GreetingService.Core
         public Task CreateAsync(Greeting greeting);
         public Task UpdateAsync(Greeting greeting);
         public Task DeleteRecordAsync(Guid id);
+        public Task<IEnumerable<Greeting>> GetAsync(string from, string to);
     };
 }
