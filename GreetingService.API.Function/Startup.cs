@@ -2,6 +2,7 @@
 using GreetingService.Core;
 using GreetingService.Infrastructure;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -47,10 +48,18 @@ namespace GreetingService.API.Function
             //    return new FileGreetingRepository(config["FileRepositoryFilePath"]);
             //});
 
+            builder.Services.AddDbContext<GreetingDbContext>(options =>
+            {
+                options.UseSqlServer(config["GreetingDbConnectionString"]);
+            });
+
+            builder.Services.AddScoped<IGreetingRepository, SqlGreetingRepository>();
             builder.Services.AddScoped<IGreetingRepository, BlobGreetingRepository>();
             builder.Services.AddScoped<IUserService, BlobUserService>();
             builder.Services.AddScoped<IAuthHandler, BasicAuthHandler>();
-            
+
+
+
         }
     }
 }
