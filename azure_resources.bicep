@@ -78,7 +78,7 @@ resource SQLServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   location: location
   properties: {
     administratorLogin: sqlServerAdmiN
-    administratorLoginPassword: 'ABCDe1234'
+    administratorLoginPassword: 'DBPassword'
     }
   resource SQLdatabase 'databases@2019-06-01-preview' = {
     name: SQLdatabaseName
