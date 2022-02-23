@@ -40,12 +40,12 @@ namespace GreetingService.API.Function
             if (!_authHandler.IsAuthorized(req))
                 return new UnauthorizedResult();
 
-            if (!Guid.TryParse(id, out var Guidid))
+            if (!Guid.TryParse(id, out var guidId))
                 return new BadRequestObjectResult($"{id} is not a valid Guid");
 
             try
             {
-                await _greetingRepository.DeleteRecordAsync(Guidid);
+                await _greetingRepository.DeleteRecordAsync(guidId);
             }
             catch (Exception)
             {

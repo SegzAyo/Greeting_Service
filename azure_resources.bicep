@@ -1,5 +1,8 @@
 param appName string
 param location string = resourceGroup().location
+param sqlAdminUser string = 'segz-server-dev'
+param sqlAdminPassword string
+param sqlDBAdminPassword string
 
 // storage accounts must be between 3 and 24 characters in length and use numbers and lower-case letters only
 var storageAccountName = '${substring(appName,0,10)}${uniqueString(resourceGroup().id)}'
@@ -8,6 +11,9 @@ var hostingPlanName = '${appName}${uniqueString(resourceGroup().id)}'
 var appInsightsName = '${appName}${uniqueString(resourceGroup().id)}'
 var appInsightsName2 = '${appName}${uniqueString(resourceGroup().id)}2'
 var functionAppName = '${appName}'
+var QLserverName = '${appName}${uniqueString(resourceGroup().id)}'
+var SQLdatabaseName = '${appName}${uniqueString(resourceGroup().id)}'
+
 
 resource hostingPlan 'Microsoft.Web/serverfarms@2020-10-01' = {
   name: hostingPlanName
@@ -66,6 +72,26 @@ resource storageAccount2 'Microsoft.Storage/storageAccounts@2019-06-01' = {
   }
 }
 
+resource SQLServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
+  name: QLserverName
+  location: location
+  sku: {
+    capacity: 5
+    name: 'Basic'
+    tier: 'Basic'
+  }
+}
+
+resource SQLdatabase 'Microsoft.Sql/servers/databases@2019-06-01-preview' = {
+  name: SQLdatabaseName
+  location: location
+  sku: {
+    capacity: 5
+    name: 'Basic'
+    tier: 'Basic'
+  }
+}
+
 resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
   name: functionAppName
   location: location
@@ -87,6 +113,14 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
         {
           'name': 'FUNCTIONS_EXTENSION_VERSION'
           'value': '~4'
+        }
+        {
+          name : 'GreetingDbConnectionString'
+          value : 'Data Source=tcp:${reference(SQLServer.id).fullyQualifiedDomainName},1433;Initial Catalog=${SQLdatabaseName};User Id=${sqlAdminUser};Password=\'${sqlAdminPassword}\';'
+        }
+        {
+          name : ''
+          value : 'Server=tcp:seg-greeting-sql-dev.database.windows.net,1433;Initial Catalog=segun-sqldb-dev;Persist Security Info=False;User ID=segs-server-dev;Password=${sqlDBAdminPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
         }
         {
           name : 'SegBlobConnectionString'

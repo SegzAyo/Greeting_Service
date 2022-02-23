@@ -79,6 +79,7 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_DB_AUTH }}
           
       - name: Azure CLI script
         uses: azure/CLI@v1
@@ -86,7 +87,7 @@ jobs:
           azcliversion: 2.30.0
           inlineScript: |
             az group create -l westeurope -n segun-rg-dev
-            az deployment group create --resource-group segun-rg-dev --template-file ./azure_resources.bicep --parameters appName=segunfuncdev1
+            az deployment group create --resource-group segun-rg-dev --template-file ./azure_resources.bicep --parameters appName=segunfuncdev1 
 
   deploy:
     runs-on: ubuntu-latest
