@@ -1,7 +1,6 @@
 param appName string
 param DBPassword string
 param location string = resourceGroup().location
-param sqlAdminUser string = 'segz-server-dev'
 param sqlDBAdmin string = 'segun-sqldb-dev'
 param sqlServerAdmiN string = 'seg-greeting-sql-dev'
 param DBAdminId string = 'segs-server-dev'
@@ -77,7 +76,10 @@ resource storageAccount2 'Microsoft.Storage/storageAccounts@2019-06-01' = {
 resource SQLServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   name: QLserverName
   location: location
-  
+  properties: {
+    administratorLogin: sqlServerAdmiN
+    administratorLoginPassword: 'ABCDe1234'
+    }
   resource SQLdatabase 'databases@2019-06-01-preview' = {
     name: SQLdatabaseName
     location: location
