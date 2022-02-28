@@ -32,8 +32,6 @@ namespace GreetingService.Infrastructure
 
             _greetingDbContext.Greetings.Remove(greeting);
             await _greetingDbContext.SaveChangesAsync();
-            
-            
         }
 
         public async Task<Greeting> GetAsync(Guid id)
@@ -94,6 +92,8 @@ namespace GreetingService.Infrastructure
             existingGreeting.Message = greeting.Message;                                                                        
             existingGreeting.To = greeting.To;
             existingGreeting.From = greeting.From;
+
+            await _greetingDbContext.SaveChangesAsync();
         }
     }
 

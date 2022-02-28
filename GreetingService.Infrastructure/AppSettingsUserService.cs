@@ -20,6 +20,11 @@ namespace GreetingService.Infrastructure
             _logger = logger;
         }
 
+        public async Task<bool> IsValidUserAsync(string username, string password)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool IsValidUser(string username, string password)
         {
             var entries = _configuration.AsEnumerable().ToDictionary(x => x.Key, x => x.Value);
@@ -35,6 +40,36 @@ namespace GreetingService.Infrastructure
             _logger.LogWarning("Invalid credentials for {username}", username);
             return false;
 
+        }
+
+        public Task<User> GetUserAsync(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<User>> GetUsersAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task CreateUserAsync(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateUserAsync(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteUserAsync(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteUserAsync(string emaail)
+        {
+            throw new NotImplementedException();
         }
     }
 };

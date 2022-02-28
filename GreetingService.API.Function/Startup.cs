@@ -54,8 +54,8 @@ namespace GreetingService.API.Function
             });
 
             builder.Services.AddScoped<IGreetingRepository, SqlGreetingRepository>();
-            builder.Services.AddScoped<IGreetingRepository, BlobGreetingRepository>();
-            builder.Services.AddScoped<IUserService, BlobUserService>();
+            //builder.Services.AddScoped<IGreetingRepository, BlobGreetingRepository>();
+            builder.Services.AddScoped<IUserService, SqlUserService>();
             builder.Services.AddScoped<IAuthHandler, BasicAuthHandler>();
 
 

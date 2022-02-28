@@ -1,59 +1,61 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using GreetingService.API.Function.Authentication;
 using GreetingService.Core;
+using GreetingService.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System.Text.Json;
-using GreetingService.Core.Entities;
+using Newtonsoft.Json;
 
 namespace GreetingService.API.Function
 {
-    public class PutGreeting
+    public class GetGreetings
     {
         private readonly ILogger<GetGreetings> _logger;
         private readonly IGreetingRepository _greetingRepository;
         private readonly IAuthHandler _authHandler;
 
-
-        public PutGreeting(ILogger<GetGreetings> log, IGreetingRepository greetingRepository, IAuthHandler authHandler)
+        public GetGreetings(ILogger<GetGreetings> log, IGreetingRepository greetingRepository, IAuthHandler authHandler)
         {
             _logger = log;
             _greetingRepository = greetingRepository;
             _authHandler = authHandler;
         }
 
-        [FunctionName("PutGreeting")]
+        [FunctionName("GetGreetings")]
         [OpenApiOperation(operationId: "Run", tags: new[] { "greeting" })]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.OK, Description = "The OK response")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(IEnumerable<Greeting>), Description = "The OK response")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict, Description = "Confict")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "greeting")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "greeting")] HttpRequest req)
         {
+            var from = req.Query["from"];
+            var to = req.Query["to"];
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-            if (!_authHandler.IsAuthorized(req))
+            if (! await _authHandler.IsAuthorizedAsync(req))
                 return new UnauthorizedResult();
 
-            var body = await req.ReadAsStringAsync();
-            var greeting = JsonSerializer.Deserialize<Greeting>(body);
-
+            IEnumerable<Greeting> greetings;
             try
             {
-                await _greetingRepository.UpdateAsync(greeting);
+                greetings = await _greetingRepository.GetAsync(from, to);
             }
-            catch
+            catch (System.Exception)
             {
-                return new NotFoundResult();
-            }
 
-            return new AcceptedResult();
+                return new NotFoundObjectResult("Not found");
+            }
+            
+
+            return new OkObjectResult(greetings);
         }
     }
 }

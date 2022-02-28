@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GreetingService.Infrastructure.Migrations
 {
     [DbContext(typeof(GreetingDbContext))]
-    [Migration("20220222095946_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220224153419_AddedUserTable")]
+    partial class AddedUserTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -48,6 +48,34 @@ namespace GreetingService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Greetings");
+                });
+
+            modelBuilder.Entity("GreetingService.Core.User", b =>
+                {
+                    b.Property<string>("email")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("firstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("lastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("email");
+
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

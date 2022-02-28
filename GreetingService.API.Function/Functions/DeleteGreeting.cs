@@ -37,23 +37,26 @@ namespace GreetingService.API.Function
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-            if (!_authHandler.IsAuthorized(req))
-                return new UnauthorizedResult();
-
-            if (!Guid.TryParse(id, out var guidId))
-                return new BadRequestObjectResult($"{id} is not a valid Guid");
-
-            try
-            {
-                await _greetingRepository.DeleteRecordAsync(guidId);
-            }
-            catch (Exception)
+            if ( await _authHandler.IsAuthorizedAsync(req))
             {
 
-                throw new Exception("An error has occured");
-            }
+                if (!Guid.TryParse(id, out var guidId))
+                    return new BadRequestObjectResult($"{id} is not a valid Guid");
 
-            return new AcceptedResult();
+                try
+                {
+                    await _greetingRepository.DeleteRecordAsync(guidId);
+                }
+                catch (Exception)
+                {
+
+                    throw new Exception("An error has occured");
+                }
+
+                return new AcceptedResult();
+            }
+            return new UnauthorizedResult();
+
         }
     }
 }

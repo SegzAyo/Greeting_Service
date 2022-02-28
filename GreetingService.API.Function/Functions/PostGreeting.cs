@@ -13,6 +13,9 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
+using System.Net.Mail;
+using System;
+using GreetingService.Core.Helper_Methods;
 
 namespace GreetingService.API.Function
 {
@@ -38,11 +41,17 @@ namespace GreetingService.API.Function
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-            if(!_authHandler.IsAuthorized(req))
+            if(! await _authHandler.IsAuthorizedAsync(req))
                 return new UnauthorizedResult();
 
             var body = await req.ReadAsStringAsync();
             var greeting = JsonSerializer.Deserialize<Greeting>(body);
+
+            if (!EmailAuth.IsValid(greeting.From))
+                throw new FormatException($"wrong format entered: {body}");
+
+            if (!EmailAuth.IsValid(greeting.To))
+                throw new FormatException($"wrong format entered: {body}");
 
             try
             {
