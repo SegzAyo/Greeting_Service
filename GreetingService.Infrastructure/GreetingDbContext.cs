@@ -13,6 +13,7 @@ namespace GreetingService.Infrastructure
     {
         public DbSet<Greeting> Greetings { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Tell EF Core that the primary key of User table is email
@@ -35,6 +36,7 @@ namespace GreetingService.Infrastructure
                .HasForeignKey(x => x.To)
                .IsRequired()
                .OnDelete(DeleteBehavior.ClientCascade);
+
         }
 
         public GreetingDbContext()
