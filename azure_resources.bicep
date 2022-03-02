@@ -115,7 +115,7 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name : 'GreetingDbConnectionString'
-          value : 'Server=tcp:${sqlServerAdmiN}.database.windows.net,1433;Initial Catalog=${sqlDBAdmin};Persist Security Info=False;User ID=${DBAdminId}};Password=${DBPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          value : 'Server=tcp:${sqlServerAdmiN}.database.windows.net,1433;Initial Catalog=${sqlDBAdmin};Persist Security Info=False;User ID=${DBAdminId};Password=${DBPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
         }
         {
           name : 'SegBlobConnectionString'
