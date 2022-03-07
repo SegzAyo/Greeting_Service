@@ -28,6 +28,6 @@ namespace GreetingService.Core.Entities
             
             }
         }
-        public string Currency { get; set; }
+        public string Currency { get; set; } = "SEK";
     }
 }

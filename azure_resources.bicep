@@ -3,7 +3,7 @@ param DBPassword string
 param location string = resourceGroup().location
 param sqlDBAdmin string = 'segun-sqldb-dev'
 param sqlServerAdmiN string = 'seg-greeting-sql-dev'
-param DBAdminId string = 'segs-server-dev'
+param DBAdminId string = 'seg-greeting-sql-dev'
 
 // storage accounts must be between 3 and 24 characters in length and use numbers and lower-case letters only
 var storageAccountName = '${substring(appName,0,10)}${uniqueString(resourceGroup().id)}'
@@ -77,8 +77,8 @@ resource SQLServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   name: QLserverName
   location: location
   properties: {
-    administratorLogin: sqlServerAdmiN
-    administratorLoginPassword: 'ABCDe1234'
+    administratorLogin: DBAdminId
+    administratorLoginPassword: DBPassword
     }
   resource SQLdatabase 'databases@2019-06-01-preview' = {
     name: SQLdatabaseName
