@@ -2,7 +2,6 @@ param appName string
 param DBPassword string
 param location string = resourceGroup().location
 param sqlDBAdmin string = 'segun-sqldb-dev'
-param sqlServerAdmiN string = 'seg-greeting-sql-dev'
 param DBAdminId string = 'seg-greeting-sql-dev'
 
 // storage accounts must be between 3 and 24 characters in length and use numbers and lower-case letters only
