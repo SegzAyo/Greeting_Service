@@ -1,7 +1,6 @@
 param appName string
 param DBPassword string
 param location string = resourceGroup().location
-param sqlDBAdmin string = 'segun-sqldb-dev'
 param DBAdminId string = 'seg-greeting-sql-dev'
 
 // storage accounts must be between 3 and 24 characters in length and use numbers and lower-case letters only
@@ -79,6 +78,13 @@ resource SQLServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
     administratorLogin: DBAdminId
     administratorLoginPassword: DBPassword
     }
+    resource allowAllWindowsAzureIps 'firewallRules@2021-05-01-preview' = {
+      name: 'AllowAllWindowsAzureIps'
+      properties: {
+        endIpAddress: '0.0.0.0'
+        startIpAddress: '0.0.0.0'
+      }
+    }
   resource SQLdatabase 'databases@2019-06-01-preview' = {
     name: SQLdatabaseName
     location: location
@@ -114,7 +120,7 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name : 'GreetingDbConnectionString'
-          value : 'Server=tcp:${sqlServerAdmiN}.database.windows.net,1433;Initial Catalog=${sqlDBAdmin};Persist Security Info=False;User ID=${DBAdminId};Password=${DBPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          value : 'Server=tcp:${SQLServer.name}.database.windows.net,1433;Initial Catalog=${SQLdatabaseName};Persist Security Info=False;User ID=${DBAdminId};Password=${DBPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
         }
         {
           name : 'SegBlobConnectionString'
