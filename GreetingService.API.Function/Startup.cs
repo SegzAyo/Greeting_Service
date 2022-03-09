@@ -1,4 +1,5 @@
-﻿using GreetingService.API.Function.Authentication;
+﻿using Azure.Messaging.ServiceBus;
+using GreetingService.API.Function.Authentication;
 using GreetingService.Core;
 using GreetingService.Infrastructure;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -12,6 +13,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using GreetingService.Infrastructure;
+
 
 [assembly: FunctionsStartup(typeof(GreetingService.API.Function.Startup))]
 namespace GreetingService.API.Function
@@ -58,7 +61,13 @@ namespace GreetingService.API.Function
             builder.Services.AddScoped<IUserService, SqlUserService>();
             builder.Services.AddScoped<IInvoiceService, SqlInvoiceService>();
             builder.Services.AddScoped<IAuthHandler, BasicAuthHandler>();
+            builder.Services.AddScoped<IMessagingService, ServiceBusMessagingService>();
 
+            builder.Services.AddSingleton(c =>
+            {
+                var serviceBusClient = new ServiceBusClient(config["ServiceBusConnectionString"]);      //remember to add this connection to the application configuration
+                return serviceBusClient.CreateSender("main");
+            });
 
 
         }

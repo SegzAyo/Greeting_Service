@@ -13,21 +13,26 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 using GreetingService.Core.Entities;
+using System;
+using GreetingService.Core.Enums;
+using GreetingService.Core.Helper_Methods;
 
 namespace GreetingService.API.Function
 {
     public class PutGreeting
     {
-        private readonly ILogger<GetGreetings> _logger;
+        private readonly ILogger<PutGreeting> _logger;
         private readonly IGreetingRepository _greetingRepository;
         private readonly IAuthHandler _authHandler;
+        private readonly IMessagingService _messageService;
 
 
-        public PutGreeting(ILogger<GetGreetings> log, IGreetingRepository greetingRepository, IAuthHandler authHandler)
+        public PutGreeting(ILogger<PutGreeting> log, IGreetingRepository greetingRepository, IAuthHandler authHandler, IMessagingService messageService)
         {
             _logger = log;
             _greetingRepository = greetingRepository;
             _authHandler = authHandler;
+            _messageService = messageService;
         }
 
         [FunctionName("PutGreeting")]
@@ -41,16 +46,31 @@ namespace GreetingService.API.Function
             if (! await _authHandler.IsAuthorizedAsync(req))
                 return new UnauthorizedResult();
 
-            var body = await req.ReadAsStringAsync();
-            var greeting = JsonSerializer.Deserialize<Greeting>(body);
+            //var body = await req.ReadAsStringAsync();
+            //var greeting = JsonSerializer.Deserialize<Greeting>(body);
+
+            Greeting greeting;
 
             try
             {
-                await _greetingRepository.UpdateAsync(greeting);
+                var body = await req.ReadAsStringAsync();
+                greeting = JsonSerializer.Deserialize<Greeting>(body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(e.Message);
+            }
+            try
+            {
+                if (!EmailAuth.IsValid(greeting.From))
+                    return new BadRequestObjectResult($"wrong email format entered");
+                if (!EmailAuth.IsValid(greeting.To))
+                    return new BadRequestObjectResult($"wrong email format entered");
+                await _messageService.SendAsync(greeting, MessagingServiceSubject.UpdateGreeting);
             }
             catch
             {
-                return new NotFoundResult();
+                return new ConflictResult();
             }
 
             return new AcceptedResult();

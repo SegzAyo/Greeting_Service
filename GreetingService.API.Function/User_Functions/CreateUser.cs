@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using GreetingService.API.Function.Authentication;
 using GreetingService.Core;
+using GreetingService.Core.Enums;
 using GreetingService.Core.Helper_Methods;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +23,9 @@ namespace GreetingService.API.Function.User_Functions
         private readonly ILogger<CreateUser> _logger;
         private readonly IUserService _userService;
         private readonly IAuthHandler _authHandler;
+        private readonly IMessagingService _messageService;
 
-        public CreateUser(ILogger<CreateUser> log, IUserService userService, IAuthHandler authHandler)
+        public CreateUser(ILogger<CreateUser> log, IUserService userService, IAuthHandler authHandler, IMessagingService messageService)
         {
             _logger = log;
             _userService = userService;
@@ -51,20 +53,19 @@ namespace GreetingService.API.Function.User_Functions
             {
                 return new BadRequestObjectResult(e.Message);
             }
+            try
+            {
+                if (!EmailAuth.IsValid(user.email))
+                    throw new FormatException($"wrong email format entered");
 
-            if (!EmailAuth.IsValid(user.email))
-                throw new FormatException($"wrong email format entered");
+                await _messageService.SendAsync(user, MessagingServiceSubject.NewUser);
+            }
+            catch
+            {
+                return new ConflictResult();
+            }
 
-            await _userService.CreateUserAsync(user);
-
-            var createdUser = await _userService.GetUserAsync(user.email);
-
-            return new OkObjectResult(createdUser);
-
-
-
-
-
+            return new AcceptedResult();
         }
     }
 }

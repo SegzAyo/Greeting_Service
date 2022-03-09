@@ -3,6 +3,9 @@ param DBPassword string
 param location string = resourceGroup().location
 param DBAdminId string = 'seg-greeting-sql-dev'
 
+param serviceBusNamespaceName string = 'segun-sb-dev${uniqueString(resourceGroup().id)}'
+param skuName string = 'Standard'
+
 // storage accounts must be between 3 and 24 characters in length and use numbers and lower-case letters only
 var storageAccountName = '${substring(appName,0,10)}${uniqueString(resourceGroup().id)}'
 var storageAccountName2 = '${substring(appName,0,10)}${uniqueString(resourceGroup().id)}2' 
@@ -95,6 +98,15 @@ resource SQLServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
     }
   }
 }
+
+resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2018-01-01-preview' = {
+  name: serviceBusNamespaceName
+  location: location
+  sku: {
+    name: skuName
+  }
+}
+
 
 resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
   name: functionAppName

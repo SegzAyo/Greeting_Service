@@ -16,6 +16,11 @@ using System.Text.Json;
 using System.Net.Mail;
 using System;
 using GreetingService.Core.Helper_Methods;
+using Azure.Messaging.ServiceBus;
+using GreetingService.Core.Enums;
+
+
+
 
 namespace GreetingService.API.Function
 {
@@ -24,12 +29,14 @@ namespace GreetingService.API.Function
         private readonly ILogger<GetGreetings> _logger;
         private readonly IGreetingRepository _greetingRepository;
         private readonly IAuthHandler _authHandler;
+        private readonly IMessagingService _messageService;
 
-        public PostGreeting(ILogger<GetGreetings> log, IGreetingRepository greetingRepository, IAuthHandler authHandler)
+        public PostGreeting(ILogger<GetGreetings> log, IGreetingRepository greetingRepository, IAuthHandler authHandler, IMessagingService messageService)
         {
             _logger = log;
             _greetingRepository = greetingRepository;
             _authHandler = authHandler;
+            _messageService = messageService;
         }
 
         [FunctionName("PostGreeting")]
@@ -44,25 +51,40 @@ namespace GreetingService.API.Function
             if(! await _authHandler.IsAuthorizedAsync(req))
                 return new UnauthorizedResult();
 
-            var body = await req.ReadAsStringAsync();
-            var greeting = JsonSerializer.Deserialize<Greeting>(body);
+            //var body = await req.ReadAsStringAsync();
+            //var greeting = JsonSerializer.Deserialize<Greeting>(body);
 
-            if (!EmailAuth.IsValid(greeting.From))
-                throw new FormatException($"wrong format entered: {body}");
+            //if (!EmailAuth.IsValid(greeting.From))
+            //    throw new FormatException($"wrong format entered: {body}");
 
-            if (!EmailAuth.IsValid(greeting.To))
-                throw new FormatException($"wrong format entered: {body}");
+            //if (!EmailAuth.IsValid(greeting.To))
+            //    throw new FormatException($"wrong format entered: {body}");
+
+            Greeting greeting;
 
             try
             {
-                await _greetingRepository.CreateAsync(greeting);
+                var body = await req.ReadAsStringAsync();
+                greeting = JsonSerializer.Deserialize<Greeting>(body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(e.Message);
+            }
+            try
+            {
+                if (!EmailAuth.IsValid(greeting.From))
+                    return new BadRequestObjectResult($"wrong email format entered");
+                if (!EmailAuth.IsValid(greeting.To))
+                    return new BadRequestObjectResult($"wrong email format entered");
+
+                await _messageService.SendAsync(greeting, MessagingServiceSubject.NewGreeting);
             }
             catch
             {
-
                 return new ConflictResult();
             }
-            
+
             return new AcceptedResult();
         }
     }
