@@ -86,7 +86,7 @@ jobs:
           azcliversion: 2.30.0
           inlineScript: |
             az group create -l westeurope -n segun-rg-dev
-            az deployment group create --resource-group segun-rg-dev --template-file ./azure_resources.bicep --parameters appName=segunfuncdev1 DBPassword=${{ secrets.AZURE_DB_AUTH }}
+            az deployment group create --resource-group segun-rg-dev --template-file ./azure_resources.bicep --parameters appName=segunfuncdev1 DBPassword=${{ secrets.AZURE_DB_AUTH }} SbPassword=${{ secrets.AZURE_SB_AUTH }}
 
   deploy:
     runs-on: ubuntu-latest

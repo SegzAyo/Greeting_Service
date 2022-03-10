@@ -1,10 +1,12 @@
 param appName string
 param DBPassword string
+param SbPassword string
 param location string = resourceGroup().location
 param DBAdminId string = 'seg-greeting-sql-dev'
 
 param serviceBusNamespaceName string = 'segun-sb-dev${uniqueString(resourceGroup().id)}'
 param skuName string = 'Standard'
+param SbAccessKeyName string ='RootManageSharedAccessKey'
 
 // storage accounts must be between 3 and 24 characters in length and use numbers and lower-case letters only
 var storageAccountName = '${substring(appName,0,10)}${uniqueString(resourceGroup().id)}'
@@ -99,13 +101,102 @@ resource SQLServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   }
 }
 
-resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2018-01-01-preview' = {
+resource servicebus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
   name: serviceBusNamespaceName
   location: location
   sku: {
     name: skuName
+    tier: 'Standard'
+  }
+  resource serviceBusTopic 'topics@2021-06-01-preview' = {
+    name: 'main'
+    properties: {
+      defaultMessageTimeToLive: 'P14D'
+      status: 'Active'
+    }
+    resource sbCreateSubscription 'subscriptions@2021-06-01-preview' = {
+      name: 'greeting_create'
+      properties: {
+        deadLetteringOnMessageExpiration: false
+        defaultMessageTimeToLive: 'P14D'
+        lockDuration: 'PT30S'
+        maxDeliveryCount: 10
+        status: 'Active'
+      }
+      resource filterRule 'rules@2021-06-01-preview' = {
+        name: 'Subject'
+        properties: {
+          filterType: 'CorrelationFilter'
+          correlationFilter: {
+            label: 'CraeteGreeting'
+            properties: {}
+          }
+        }
+      }
+    }
+    resource sbUpdateGreetingSubscription 'subscriptions@2021-06-01-preview' = {
+      name: 'greeting_update'
+      properties: {
+        deadLetteringOnMessageExpiration: false
+        defaultMessageTimeToLive: 'P14D'
+        lockDuration: 'PT30S'
+        maxDeliveryCount: 10
+        status: 'Active'
+      }
+      resource filterRule 'rules@2021-06-01-preview' = {
+        name: 'Subject'
+        properties: {
+          filterType: 'CorrelationFilter'
+          correlationFilter: {
+            label: 'UpdateGreeting'
+            properties: {}
+          }
+        }
+      }
+    }
+    resource sbCreateUserSubscription 'subscriptions@2021-06-01-preview' = {
+      name: 'user_create'
+      properties: {
+        deadLetteringOnMessageExpiration: false
+        defaultMessageTimeToLive: 'P14D'
+        lockDuration: 'PT30S'
+        maxDeliveryCount: 10
+        status: 'Active'
+      }
+      resource filterRule 'rules@2021-06-01-preview' = {
+        name: 'Subject'
+        properties: {
+          filterType: 'CorrelationFilter'
+          correlationFilter: {
+            label: 'NewUser'
+            properties: {}
+          }
+        }
+      }
+    }
+    resource sbUpdateUserSubscription 'subscriptions@2021-06-01-preview' = {
+      name: 'user_update'
+      properties: {
+        deadLetteringOnMessageExpiration: false
+        defaultMessageTimeToLive: 'P14D'
+        lockDuration: 'PT30S'
+        maxDeliveryCount: 10
+        status: 'Active'
+      }
+      resource filteRule 'rules@2021-06-01-preview' = {
+        name: 'Subject'
+        properties: {
+          filterType: 'CorrelationFilter'
+          correlationFilter: {
+            label: 'UpdateUser'
+            properties: {}
+          }
+        }
+      }
+    }
   }
 }
+
 
 
 resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
@@ -145,6 +236,9 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
         {
           name : 'WEBSITE_RUN_FROM_PACKAGE'
           value : '1'
+        }
+        {
+          name : 'Endpoint=sb://${servicebus.name}.servicebus.windows.net/;SharedAccessKeyName=${SbAccessKeyName};SharedAccessKey=${SbPassword}'
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
