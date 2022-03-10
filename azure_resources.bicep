@@ -194,6 +194,26 @@ resource servicebus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
         }
       }
     }
+    resource sbGreetingComputeBillingSubscription 'subscriptions@2021-06-01-preview' = {
+      name: 'greeting_compute_billing'
+      properties: {
+        deadLetteringOnMessageExpiration: false
+        defaultMessageTimeToLive: 'P14D'
+        lockDuration: 'PT30S'
+        maxDeliveryCount: 10
+        status: 'Active'
+      }
+      resource filteRule 'rules@2021-06-01-preview' = {
+        name: 'Subject'
+        properties: {
+          filterType: 'CorrelationFilter'
+          correlationFilter: {
+            label: 'ComputeBilling'
+            properties: {}
+          }
+        }
+      }
+    }
   }
 }
 
