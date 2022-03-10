@@ -183,7 +183,7 @@ resource servicebus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
         maxDeliveryCount: 10
         status: 'Active'
       }
-      resource filteRule 'rules@2021-06-01-preview' = {
+      resource filterRule 'rules@2021-06-01-preview' = {
         name: 'Subject'
         properties: {
           filterType: 'CorrelationFilter'
@@ -203,7 +203,7 @@ resource servicebus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
         maxDeliveryCount: 10
         status: 'Active'
       }
-      resource filteRule 'rules@2021-06-01-preview' = {
+      resource filterRule 'rules@2021-06-01-preview' = {
         name: 'Subject'
         properties: {
           filterType: 'CorrelationFilter'
