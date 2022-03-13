@@ -15,6 +15,6 @@ namespace GreetingService.Core.Enums
         UpdateGreeting,
         NewUser,
         UpdateUser,
-        ComputeBilling,
+        
     }
 }

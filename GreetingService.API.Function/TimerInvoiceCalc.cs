@@ -23,7 +23,7 @@ namespace GreetingService.API.Function
         }
 
         [FunctionName("TimerInvoiceCalc")]
-        public async Task Run([TimerTrigger("*/30 * * * * *")]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("* * * */1 * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
