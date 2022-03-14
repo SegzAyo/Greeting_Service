@@ -208,7 +208,7 @@ resource servicebus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
         properties: {
           filterType: 'CorrelationFilter'
           correlationFilter: {
-            label: 'UpdateUser'
+            label: 'NewUser'
             properties: {}
           }
         }
