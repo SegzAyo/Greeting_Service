@@ -258,7 +258,8 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
           value : '1'
         }
         {
-          name : 'Endpoint=sb://${servicebus.name}.servicebus.windows.net/;SharedAccessKeyName=${SbAccessKeyName};SharedAccessKey=${SbPassword}'
+          name : 'ServiceBusConnectionString'
+          value : 'Endpoint=sb://${servicebus.name}.servicebus.windows.net/;SharedAccessKeyName=${SbAccessKeyName};SharedAccessKey=${SbPassword}'
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
