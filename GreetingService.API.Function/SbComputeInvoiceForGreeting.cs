@@ -22,14 +22,15 @@ namespace GreetingService.API.Function
         }
 
         [FunctionName("SbComputeInvoiceForGreeting")]
-        public async Task Run([ServiceBusTrigger("main", "greeting_compute_invoice", Connection = "ServiceBusConnectionString")]Greeting greeting)
+        public async Task Run([ServiceBusTrigger("main", "greeting_compute_billing", Connection = "ServiceBusConnectionString")]Greeting greeting)
         {
             _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {greeting}");
 
+            User user;
             try
             {
                 var invoice = await _invoiceService.GetInvoiceAsync(greeting.Timestamp.Year, greeting.Timestamp.Month, greeting.From);          //This method returns null if invoice not found
-                var user = await _userService.GetUserAsync(greeting.From);
+                user = await _userService.GetUserAsync(greeting.From);
 
                 if (invoice == null)                                                        //Invoice does not exist, create a new invoice
                 {

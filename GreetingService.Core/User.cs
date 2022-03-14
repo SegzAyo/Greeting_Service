@@ -14,5 +14,9 @@ namespace GreetingService.Core
         public string password { get; set; }    
         public DateTime created { get; set; }
         public DateTime modified  { get; set; }
+        public string ApprovalStatus { get; set; } = "Pending";
+        public string ApprovalCode { get; set; }
+        public string ApprovalStatusNote { get; set; }
+        public DateTime ApprovalExpiry { get; set; } = DateTime.Now.AddHours(6);
     }
 }

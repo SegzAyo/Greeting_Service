@@ -21,7 +21,7 @@ namespace GreetingService.API.Function.SB_Function
         }
 
         [FunctionName("SbCreateUser")]
-        public async Task Run([ServiceBusTrigger("main", "user_new", Connection = "ServiceBusConnectionString")]User user)
+        public async Task Run([ServiceBusTrigger("main", "user_create", Connection = "ServiceBusConnectionString")]User user)
         {
             _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {user}");
 
