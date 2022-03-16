@@ -8,7 +8,6 @@ param serviceBusNamespaceName string = 'segun-sb-dev${uniqueString(resourceGroup
 param skuName string = 'Standard'
 param SbAccessKeyName string ='RootManageSharedAccessKey'
 
-param keyVaultNamespaceName string = 'segun-kv-dev${uniqueString(resourceGroup().id)}'
 param kvSkuName string = 'Standard'
 param tenantId string = subscription().tenantId
 //param SbAccessKeyName string ='RootManageSharedAccessKey'
@@ -20,6 +19,7 @@ var hostingPlanName = '${appName}${uniqueString(resourceGroup().id)}'
 var appInsightsName = '${appName}${uniqueString(resourceGroup().id)}'
 var appInsightsName2 = '${appName}${uniqueString(resourceGroup().id)}2'
 var functionAppName = '${appName}'
+var keyVaultNamespaceName = '${appName}keyVault'
 var QLserverName = '${appName}${uniqueString(resourceGroup().id)}'
 var SQLdatabaseName = '${appName}${uniqueString(resourceGroup().id)}'
 
