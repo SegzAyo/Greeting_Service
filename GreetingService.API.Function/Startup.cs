@@ -14,7 +14,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using GreetingService.Infrastructure;
-
+using Azure.Identity;
+using Microsoft.Extensions.Hosting;
 
 [assembly: FunctionsStartup(typeof(GreetingService.API.Function.Startup))]
 namespace GreetingService.API.Function
@@ -43,8 +44,6 @@ namespace GreetingService.API.Function
                 c.AddSerilog(logger, true);
             });
 
-
-
             //builder.Services.AddScoped<IGreetingRepository, FileGreetingRepository>(c =>
             //{
             //    var config = c.GetService<IConfiguration>();
@@ -65,6 +64,8 @@ namespace GreetingService.API.Function
             builder.Services.AddScoped<IApprovalService, TeamsApprovalService>();
 
 
+
+
             builder.Services.AddSingleton(c =>
             {
                 var serviceBusClient = new ServiceBusClient(config["ServiceBusConnectionString"]);      //remember to add this connection to the application configuration
@@ -72,6 +73,34 @@ namespace GreetingService.API.Function
             });
 
 
+        }
+        public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
+        {
+            var builtConfig = builder.ConfigurationBuilder.Build();
+            var keyVaultEndpoint = builtConfig["AzureKeyVaultEndpoint"];
+
+            if (!string.IsNullOrEmpty(keyVaultEndpoint))
+            {
+                // might need this depending on local dev env
+                //var credential = new DefaultAzureCredential(
+                //    new DefaultAzureCredentialOptions { ExcludeSharedTokenCacheCredential = true });
+
+                // using Key Vault, either local dev or deployed
+                builder.ConfigurationBuilder
+
+                        .AddAzureKeyVault(keyVaultEndpoint);
+                       
+            }
+            else
+            {
+                // local dev no Key Vault
+                builder.ConfigurationBuilder
+                   .SetBasePath(Environment.CurrentDirectory)
+                   .AddJsonFile("local.settings.json", true)
+                   .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                   .AddEnvironmentVariables()
+                   .Build();
+            }
         }
     }
 }

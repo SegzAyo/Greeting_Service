@@ -8,6 +8,11 @@ param serviceBusNamespaceName string = 'segun-sb-dev${uniqueString(resourceGroup
 param skuName string = 'Standard'
 param SbAccessKeyName string ='RootManageSharedAccessKey'
 
+param keyVaultNamespaceName string = 'segun-kv-dev${uniqueString(resourceGroup().id)}'
+param kvSkuName string = 'Standard'
+param tenantId string = subscription().tenantId
+//param SbAccessKeyName string ='RootManageSharedAccessKey'
+
 // storage accounts must be between 3 and 24 characters in length and use numbers and lower-case letters only
 var storageAccountName = '${substring(appName,0,10)}${uniqueString(resourceGroup().id)}'
 var storageAccountName2 = '${substring(appName,0,10)}${uniqueString(resourceGroup().id)}2' 
@@ -17,6 +22,45 @@ var appInsightsName2 = '${appName}${uniqueString(resourceGroup().id)}2'
 var functionAppName = '${appName}'
 var QLserverName = '${appName}${uniqueString(resourceGroup().id)}'
 var SQLdatabaseName = '${appName}${uniqueString(resourceGroup().id)}'
+
+resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
+  name: keyVaultNamespaceName
+  location: location
+  properties: {
+    sku: {
+      family: 'A'
+      name: kvSkuName
+    }
+    tenantId: tenantId
+
+    enableRbacAuthorization: false      // Using Access Policies model
+    accessPolicies: [
+      {
+        objectId: 'd89101d9-cf97-4b6c-9656-c6da457d8add'
+        tenantId: tenantId
+        permissions: {
+          secrets: [
+            'all'
+          ]
+          certificates: [
+            'all'
+          ]
+          keys: [
+            'all'
+          ]
+        }
+      }
+    ]
+
+    enabledForDeployment: true          // VMs can retrieve certificates
+    enabledForTemplateDeployment: true  // ARM can retrieve values
+
+    enablePurgeProtection: true         // Not allowing to purge key vault or its objects after deletion
+    enableSoftDelete: true
+    softDeleteRetentionInDays: 7
+    createMode: 'default'               // Creating or updating the key vault (not recovering)
+  }
+}
 
 
 resource hostingPlan 'Microsoft.Web/serverfarms@2020-10-01' = {
@@ -263,11 +307,11 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name : 'GreetingDbConnectionString'
-          value : 'Server=tcp:${SQLServer.name}.database.windows.net,1433;Initial Catalog=${SQLdatabaseName};Persist Security Info=False;User ID=${DBAdminId};Password=${DBPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          value : '@Microsoft.KeyVault(SecretUri=https://${keyVaultNamespaceName}.vault.azure.net/secrets/GreetingDbConnectionString/)'
         }
         {
           name : 'SegBlobConnectionString'
-          value : 'DefaultEndpointsProtocol=https;AccountName=${storageAccount2.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount2.id, storageAccount2.apiVersion).keys[0].value}'
+          value : '@Microsoft.KeyVault(SecretUri=https://${keyVaultNamespaceName}.vault.azure.net/secrets/SegBlobConnectionString/)'
         }
         {
           'name': 'FUNCTIONS_WORKER_RUNTIME'
@@ -279,7 +323,7 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name : 'ServiceBusConnectionString'
-          value : 'Endpoint=sb://${servicebus.name}.servicebus.windows.net/;SharedAccessKeyName=${SbAccessKeyName};SharedAccessKey=${SbPassword}'
+          value : '@Microsoft.KeyVault(SecretUri=https://${keyVaultNamespaceName}.vault.azure.net/secrets/ServiceBusConnectionString/)'
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
