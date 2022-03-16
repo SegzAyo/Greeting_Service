@@ -36,7 +36,22 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
     enableRbacAuthorization: false      // Using Access Policies model
     accessPolicies: [
       {
-        objectId: 'd89101d9-cf97-4b6c-9656-c6da457d8add'
+        objectId: functionApp.identity.principalId
+        tenantId: tenantId
+        permissions: {
+          secrets: [
+            'all'
+          ]
+          certificates: [
+            'all'
+          ]
+          keys: [
+            'all'
+          ]
+        }
+      }
+      {
+        objectId: 'ac3df87b-3b78-47bb-8a91-d9a78a416f72'
         tenantId: tenantId
         permissions: {
           secrets: [
