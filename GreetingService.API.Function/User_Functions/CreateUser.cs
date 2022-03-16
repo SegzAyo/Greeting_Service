@@ -30,6 +30,7 @@ namespace GreetingService.API.Function.User_Functions
             _logger = log;
             _userService = userService;
             _authHandler = authHandler;
+            _messageService = messageService;
         }
 
         [FunctionName("CreateUser")]

@@ -62,6 +62,8 @@ namespace GreetingService.API.Function
             builder.Services.AddScoped<IInvoiceService, SqlInvoiceService>();
             builder.Services.AddScoped<IAuthHandler, BasicAuthHandler>();
             builder.Services.AddScoped<IMessagingService, ServiceBusMessagingService>();
+            builder.Services.AddScoped<IApprovalService, TeamsApprovalService>();
+
 
             builder.Services.AddSingleton(c =>
             {

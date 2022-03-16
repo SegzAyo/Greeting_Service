@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static GreetingService.Core.User;
 
 namespace GreetingService.Infrastructure
 {
@@ -90,14 +91,43 @@ namespace GreetingService.Infrastructure
             throw new NotImplementedException();
         }
 
-        public Task ApproveUserAsync(string approvalCode)
+        public async Task ApproveUserAsync(string approvalCode)
         {
-            throw new NotImplementedException();
+            var user = _greetingDbContext.Users.FirstOrDefault(u => u.ApprovalCode == approvalCode);
+
+            if (user == null)
+                throw new Exception("User not found");
+     
+            if (user.ApprovalStatus == UserApprovalStatus.Rejected)
+                throw new Exception("User has been rejected");
+
+            if (user.created > user.ApprovalExpiry)
+                throw new Exception("User registration has expired");
+
+            user.ApprovalStatus = UserApprovalStatus.Approved;
+            user.ApprovalStatusNote = "User has been approved";
+
+            _greetingDbContext.SaveChanges();
+
         }
 
-        public Task RejectUserAsync(string approvalCode)
+        public async Task RejectUserAsync(string approvalCode)
         {
-            throw new NotImplementedException();
+            var user = _greetingDbContext.Users.FirstOrDefault(u => u.ApprovalCode == approvalCode);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            if (user.ApprovalStatus == UserApprovalStatus.Rejected)
+                throw new Exception("User has been rejected");
+
+            if (user.created > user.ApprovalExpiry)
+                throw new Exception("User registration has expired");
+
+            user.ApprovalStatus = UserApprovalStatus.Rejected;
+            user.ApprovalStatusNote = "User has been rejected";
+
+            _greetingDbContext.SaveChanges();
         }
     }
 }

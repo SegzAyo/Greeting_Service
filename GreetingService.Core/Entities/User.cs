@@ -29,8 +29,8 @@ namespace GreetingService.Core
             }
         } 
         public string password { get; set; }    
-        public DateTime created { get; set; }
-        public DateTime modified  { get; set; }
+        public DateTime created { get; set; } = DateTime.Now;
+        public DateTime modified  { get; set; } =DateTime.Now;
         public UserApprovalStatus ApprovalStatus { get; set; }
         public string ApprovalCode { get; set; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)).Replace("/", "").Replace("?", "");
         public string ApprovalStatusNote { get; set; }
