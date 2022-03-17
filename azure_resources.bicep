@@ -23,6 +23,7 @@ var keyVaultNamespaceName = '${appName}keyVault'
 var QLserverName = '${appName}${uniqueString(resourceGroup().id)}'
 var SQLdatabaseName = '${appName}${uniqueString(resourceGroup().id)}'
 
+
 resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
   name: keyVaultNamespaceName
   location: location
@@ -74,6 +75,34 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
     enableSoftDelete: true
     softDeleteRetentionInDays: 7
     createMode: 'default'               // Creating or updating the key vault (not recovering)
+  }
+
+  resource loggingStorageAccountSecret 'secrets@2021-11-01-preview' = {
+    name: 'storageAccountName2'
+    properties: {
+      value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount2.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount2.id, storageAccount2.apiVersion).keys[0].value}'
+    }
+  }
+
+  resource GreetingDbConnectionStringSecret 'secrets@2021-11-01-preview' = {
+    name: 'GreetingDbConnectionString'
+    properties: {
+      value: 'Data Source=tcp:${reference(SQLServer.id).fullyQualifiedDomainName},1433;Initial Catalog=${SQLdatabaseName};User Id=${DBAdminId};Password=\'${DBPassword}\';'
+    }
+
+  resource serviceBusConnectionStringSecret 'secrets@2021-11-01-preview' = {
+    name: 'serviceBusNamespaceName'
+    properties: {
+      value: listKeys('${servicebus.id}/AuthorizationRules/RootManageSharedAccessKey', servicebus.apiVersion).primaryConnectionString
+    }
+  }  
+
+  resource greetingServiceBaseUrlSecret 'secrets@2021-11-01-preview' = {
+    name: 'GreetingServiceBaseUrl'
+    properties: {
+      value: 'https://${appName}.azurewebsites.net'
+    }
+  }
   }
 }
 
