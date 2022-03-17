@@ -38,7 +38,7 @@ namespace GreetingService.Infrastructure
 
         public async Task<Invoice> GetInvoiceAsync(int year, int month, string email)
         {
-            var checkInvoice = _greetingDbContext.Invoices.FirstOrDefault(inv => inv.Year == year && inv.Month == month && inv.User.email == email);
+            var checkInvoice = _greetingDbContext.Invoices.Include(x=>x.SentGreetings).FirstOrDefault(inv => inv.Year == year && inv.Month == month && inv.User.email == email);
             if (checkInvoice == null)
                 throw new Exception("Invoice not found");
 

@@ -89,7 +89,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
     }
   }
   resource serviceBusConnectionStringSecret 'secrets@2021-11-01-preview' = {
-    name: 'serviceBusNamespaceName'
+    name: 'ServiceBusConnectionString'
     properties: {
       value: listKeys('${servicebus.id}/AuthorizationRules/RootManageSharedAccessKey', servicebus.apiVersion).primaryConnectionString
     }
@@ -101,6 +101,14 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
       value: 'https://${appName}.azurewebsites.net'
     }
   }
+
+  resource keyVaultUri 'secrets@2021-11-01-preview' = {
+    name: 'AzureKeyVaultEndpoint'
+    properties: {
+      value: 'https://${keyVault.name}.vault.azure.net/'
+    }
+  }
+  
   
 }
 
