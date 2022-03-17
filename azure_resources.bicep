@@ -1,12 +1,10 @@
 param appName string
 param DBPassword string
-param SbPassword string
 param location string = resourceGroup().location
 param DBAdminId string = 'seg-greeting-sql-dev'
 
 param serviceBusNamespaceName string = 'segun-sb-dev${uniqueString(resourceGroup().id)}'
 param skuName string = 'Standard'
-param SbAccessKeyName string ='RootManageSharedAccessKey'
 
 param kvSkuName string = 'Standard'
 param tenantId string = subscription().tenantId
@@ -78,7 +76,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
   }
 
   resource loggingStorageAccountSecret 'secrets@2021-11-01-preview' = {
-    name: 'storageAccountName2'
+    name: 'LoggingStorageAccount'
     properties: {
       value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount2.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount2.id, storageAccount2.apiVersion).keys[0].value}'
     }
@@ -89,7 +87,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
     properties: {
       value: 'Data Source=tcp:${reference(SQLServer.id).fullyQualifiedDomainName},1433;Initial Catalog=${SQLdatabaseName};User Id=${DBAdminId};Password=\'${DBPassword}\';'
     }
-
+  }
   resource serviceBusConnectionStringSecret 'secrets@2021-11-01-preview' = {
     name: 'serviceBusNamespaceName'
     properties: {
@@ -103,7 +101,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
       value: 'https://${appName}.azurewebsites.net'
     }
   }
-  }
+  
 }
 
 
@@ -379,4 +377,3 @@ resource functionApp 'Microsoft.Web/sites@2020-06-01' = {
     }
   }
 }
-
